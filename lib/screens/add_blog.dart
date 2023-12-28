@@ -73,6 +73,10 @@ class _AddBlogState extends State<AddBlog> {
                     onPressed: () {
                       openImagePicker();
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:  const Color.fromARGB(255, 101, 226, 166),
+                      foregroundColor: Colors.black
+                    ),
                     child: const Text("Resim Seç")),
                 TextFormField(
                   decoration:
@@ -117,7 +121,12 @@ class _AddBlogState extends State<AddBlog> {
                   _formKey.currentState!.save();
                   submitForm();
                  }
-                }, child: const Text("Gönder"))
+                }, 
+                style: ElevatedButton.styleFrom(
+                      backgroundColor:  const Color.fromARGB(255, 101, 226, 166),
+                      foregroundColor: Colors.black
+                    ),
+                child: const Text("Gönder"))
               ],
             )),
       ),

@@ -85,7 +85,10 @@ class _BlogDetailState extends State<BlogDetail> {
                   AspectRatio(
                     aspectRatio: 2 / 2,
                     child: Container(
-                      color: const Color.fromARGB(109, 210, 210, 210),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: const Color.fromARGB(109, 210, 210, 210),
+                      ),
                       child: Image.network(
                         blogItem.thumbnail ?? "",
                         fit: BoxFit.contain,
@@ -100,11 +103,13 @@ class _BlogDetailState extends State<BlogDetail> {
                   const SizedBox(height: 20),
                   Text(
                     blogItem.content ?? "",
-                    style:const TextStyle(fontSize:15),),
+                    style: const TextStyle(fontSize: 15,),
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 15),
                   Text(
                     blogItem.author ?? "",
-                    style:const TextStyle(fontSize:13 ),
+                    style: const TextStyle(fontSize: 13),
                   ),
                 ],
               ),
