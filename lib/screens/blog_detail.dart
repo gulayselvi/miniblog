@@ -48,18 +48,6 @@ class _BlogDetailState extends State<BlogDetail> {
                 bottomRight: Radius.circular(20),
                 bottomLeft: Radius.circular(20))),
         backgroundColor: const Color.fromARGB(255, 101, 226, 166),
-        title: FutureBuilder<Map<String, dynamic>>(
-          future: _blogDetails,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Text('Yükleniyor...');
-            } else if (snapshot.hasError) {
-              return const Text('Blog detayları yüklenirken hata oluştu');
-            } else {
-              return Text(snapshot.data?['title'] ?? '');
-            }
-          },
-        ),
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _blogDetails,
@@ -103,7 +91,9 @@ class _BlogDetailState extends State<BlogDetail> {
                   const SizedBox(height: 20),
                   Text(
                     blogItem.content ?? "",
-                    style: const TextStyle(fontSize: 15,),
+                    style: const TextStyle(
+                      fontSize: 15,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 15),
