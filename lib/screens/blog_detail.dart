@@ -1,44 +1,18 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:miniblog/models/blog.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:miniblog/blocs/article_bloc/article_bloc.dart';
+import 'package:miniblog/blocs/article_bloc/article_event.dart';
+import 'package:miniblog/blocs/article_bloc/article_state.dart';
 
 class BlogDetail extends StatefulWidget {
-  const BlogDetail({Key? key, required this.blogId}) : super(key: key);
-  final String? blogId;
+  const BlogDetail({Key? key, required this.id}) : super(key: key);
+  final String id;
 
   @override
   _BlogDetailState createState() => _BlogDetailState();
 }
 
 class _BlogDetailState extends State<BlogDetail> {
-  late Future<Map<String, dynamic>> _blogDetails;
-  late Blog blogItem;
-
-  @override
-  void initState() {
-    super.initState();
-    _blogDetails = fetchBlogDetail();
-  }
-
-  Future<Map<String, dynamic>> fetchBlogDetail() async {
-    Uri url = Uri.parse(
-        "https://tobetoapi.halitkalayci.com/api/Articles/${widget.blogId}");
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      setState(() {
-        blogItem = Blog.fromJson(jsonData);
-      });
-      return jsonData;
-    } else {
-      throw Exception('Blog detayları yüklenemedi');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,65 +22,51 @@ class _BlogDetailState extends State<BlogDetail> {
                 bottomRight: Radius.circular(20),
                 bottomLeft: Radius.circular(20))),
         backgroundColor: const Color.fromARGB(255, 101, 226, 166),
+        title: const Text("Detay"),
       ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: _blogDetails,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
+      body: BlocBuilder<ArticleBloc, ArticleState>(builder: (context, state) {
+        if (state is ArticlesInitial) {
+          context.read<ArticleBloc>().add(FetchArticleDetail(id: widget.id));
+          return const Text("İstek atılmalı..");
+        }
+
+        if (state is ArticleDetailsLoading) {
+          return const Center(
               child: CircularProgressIndicator(
-                backgroundColor: Colors.grey,
-                color: Color.fromARGB(255, 101, 226, 166),
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return const Center(
-              child: Text('Blog detayları yüklenirken hata oluştu'),
-            );
-          } else {
-            blogItem =
-                Blog.fromJson(snapshot.data!); // Burada blogItem'ı ayarla
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 15),
-              child: Column(
-                children: [
-                  AspectRatio(
-                    aspectRatio: 2 / 2,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: const Color.fromARGB(109, 210, 210, 210),
-                      ),
-                      child: Image.network(
-                        blogItem.thumbnail ?? "",
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    blogItem.title ?? "",
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    blogItem.content ?? "",
-                    style: const TextStyle(
-                      fontSize: 15,
-                    ),
+            backgroundColor: Colors.grey,
+            color: Color.fromARGB(255, 101, 226, 166),
+          ));
+        }
+
+        if (state is ArticlesDetailLoaded) {
+          return Center(
+            child: Column(
+              children: [
+                AspectRatio(
+                    aspectRatio: 10 / 7,
+                    child: Image.network(state.blog.thumbnail!)),
+                const SizedBox(height: 40),
+                Text(state.blog.title!),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  child: Text(
+                    state.blog.content!,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 15),
-                  Text(
-                    blogItem.author ?? "",
-                    style: const TextStyle(fontSize: 13),
-                  ),
-                ],
-              ),
-            );
-          }
-        },
-      ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (state is ArticlesDetailError) {
+          return const Center(child: Text("Bloglar yüklenirken hata oluştu"));
+        }
+        return const Center(
+          child: Text("Unknown State"),
+        );
+      }),
     );
   }
 }
