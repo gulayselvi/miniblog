@@ -13,6 +13,15 @@ class BlogDetail extends StatefulWidget {
 }
 
 class _BlogDetailState extends State<BlogDetail> {
+  void initState() {
+    super.initState();
+    fetchArticleDetail();
+  }
+
+  void fetchArticleDetail() {
+    context.read<ArticleBloc>().add(FetchArticleDetail(id: widget.id));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +35,6 @@ class _BlogDetailState extends State<BlogDetail> {
       ),
       body: BlocBuilder<ArticleBloc, ArticleState>(builder: (context, state) {
         if (state is ArticlesInitial) {
-          context.read<ArticleBloc>().add(FetchArticleDetail(id: widget.id));
           return const Text("İstek atılmalı..");
         }
 
@@ -43,18 +51,40 @@ class _BlogDetailState extends State<BlogDetail> {
             child: Column(
               children: [
                 AspectRatio(
-                    aspectRatio: 10 / 7,
-                    child: Image.network(state.blog.thumbnail!)),
-                const SizedBox(height: 40),
-                Text(state.blog.title!),
+                  aspectRatio: 2 / 2,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(109, 210, 210, 210),
+                      borderRadius: BorderRadius.circular(15),
+                      image: DecorationImage(
+                        fit: BoxFit
+                            .contain, // Resmi uygun bir şekilde sığdırmak için
+                        image: NetworkImage(state.blog.thumbnail!),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                Text(state.blog.title!,
+                    style: const TextStyle(
+                      fontSize: 20,
+                    )),
                 const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 5),
                   child: Text(
                     state.blog.content!,
+                    style: const TextStyle(
+                      fontSize: 15,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
+                const SizedBox(height: 15),
+                Text(
+                  state.blog.author!,
+                  style: const TextStyle(fontSize: 13),
+                )
               ],
             ),
           );
